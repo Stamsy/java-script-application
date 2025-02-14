@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main  # Runs when pushing to the main branch
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
+    inputs:
+      resumeUrl:
+        description: "n8n resume URL"
+        required: false
 
 jobs:
   build:
@@ -25,15 +29,20 @@ jobs:
       - name: Install Dependencies
         run: |
           echo "Installing dependencies..."
-          npm install
+          if [ -f "package.json" ]; then
+            npm install
+          else
+            echo "Error: package.json not found!"
+            exit 1
+          fi
 
       - name: Debug Installed Dependencies
-        run: echo "Installed dependencies: $(ls node_modules)"
+        run: ls -la node_modules || echo "node_modules directory not found"
 
       - name: Run Tests
         run: |
           echo "Running tests..."
-          npm test -- --verbose  # Add verbose output for debugging
+          npm test -- --verbose || echo "Tests failed!"
 
       - name: Notify n8n to resume workflow
         if: always()  # Ensure this step runs even if previous steps fail

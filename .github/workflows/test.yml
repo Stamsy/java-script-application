@@ -4,11 +4,7 @@ on:
   push:
     branches:
       - main  # Runs when pushing to the main branch
-  workflow_dispatch:
-    inputs:
-      resumeUrl:
-        description: "n8n resume URL"
-        required: false
+  workflow_dispatch:  # ✅ This allows manual triggers from n8n
 
 jobs:
   build:
@@ -23,34 +19,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Debug Node.js Version
-        run: echo "Node.js version: $(node -v)"
-
       - name: Install Dependencies
         run: |
-          echo "Installing dependencies..."
-          if [ -f "package.json" ]; then
-            npm install
-          else
-            echo "Error: package.json not found!"
-            exit 1
-          fi
-
-      - name: Debug Installed Dependencies
-        run: ls -la node_modules || echo "node_modules directory not found"
+          npm install
 
       - name: Run Tests
         run: |
-          echo "Running tests..."
-          npm test -- --verbose || echo "Tests failed!"
-
-      - name: Notify n8n to resume workflow
-        if: always()  # Ensure this step runs even if previous steps fail
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            RESUME_URL="${{ github.event.inputs.resumeUrl }}"
-            if [ -n "$RESUME_URL" ]; then
-              echo "Calling n8n webhook URL: $RESUME_URL"
-              curl -X POST "$RESUME_URL" -H "Content-Type: application/json" -d '{"status": "completed"}'
-            fi
-          fi
+          npm test

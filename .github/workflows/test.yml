@@ -19,18 +19,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Debug Node.js Version
-        run: echo "Node.js version: $(node -v)"
-
       - name: Install Dependencies
-        run: |
-          echo "Installing dependencies..."
-          npm install
-
-      - name: Debug Installed Dependencies
-        run: echo "Installed dependencies: $(ls node_modules)"
+        run: npm install
 
       - name: Run Tests
-        run: |
-          echo "Running tests..."
-          npm test -- --verbose  # Add verbose output for debugging
+        run: npm test
